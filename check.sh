@@ -39,7 +39,7 @@ git clone http://github.com/danmar/cppcheck.git
 cd cppcheck
 make clean
 # Compile cppcheck with afl
-make CXX=../afl/afl-g++ CC=./afl/afl-gcc CXXFLAGS+='-O3' CFGDIR=cfg HAVE_RULES=yes AFL_HARDEN=1 -j3
+make CXX=../afl/afl-g++ CC=./afl/afl-gcc CXXFLAGS+='-O3 -std=c++0x' CFGDIR=cfg HAVE_RULES=yes AFL_HARDEN=1 -j3
 cd ..
 afl/afl-fuzz -i $1 -o afl-output -d -- ./cppcheck/cppcheck --enable=all --inconclusive --force @@
 cd ..
