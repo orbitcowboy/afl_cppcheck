@@ -22,7 +22,7 @@ set -e
 # Validate the number of input parameters
 if [ $# -le 0 ]
   then
-    /bin/echo "Please call this script with exactly parameter: [path to input folderl]."
+    /bin/echo "Please call this script with exactly parameter: [path to input folder]."
     /bin/echo "e.g.: check.sh input_folder"
     exit
 fi
