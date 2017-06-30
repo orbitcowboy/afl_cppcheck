@@ -8,7 +8,7 @@ set -e
 #  	$1 --> A path pointing to C/C++ test cases for afl to get started.
 #
 # Author: Dr. Martin Ettl
-# Date  : 2015-11-06
+# Date  : 2017-06-30
 # 
 # Dependencies:
 #
@@ -16,7 +16,7 @@ set -e
 # 
 # Example:
 #
-# $ check.sh some_folder
+# $ check.sh [some_folder]
 # ----------------------------------------------------------------------
 
 # Validate the number of input parameters
@@ -30,21 +30,15 @@ fi
 # Get afl sources
 git clone https://github.com/mirrorer/afl.git
 cd afl
-make clean
-# Ensure llvm-config is available. On Ubuntu systems, a symbolic link has to be created:
-# cd /usr/bin/ && sudo ln -s llvm-config-3.6 llvm-config
-cd llvm_mode
 make 
-cd ..
-make
 cd ..
 
 # Get cppcheck sources
-git clone http://github.com/danmar/cppcheck.git
+git clone https://github.com/danmar/cppcheck.git
 cd cppcheck
 make clean
 # Compile cppcheck with afl
-make CXX=../afl/afl-clang-fast++ CC=../afl/afl-clang-fast CXXFLAGS+='-O3 -std=c++0x' HAVE_RULES=yes AFL_HARDEN=1 -j3
+make CXX=../afl/afl-g++ CC=../afl/afl-gcc CXXFLAGS+='-O3 -std=c++0x -DNDEBUG' HAVE_RULES=yes SRCDIR=build AFL_HARDEN=1 -j3
 cd ..
 afl/afl-fuzz -i $1 -o afl-output -x dictionary -- ./cppcheck/cppcheck --enable=all --inconclusive --force --std=posix @@
 cd ..
