@@ -10,3 +10,12 @@ A script to start fuzzing of cppcheck with american fuzzy lop
 - cd afl_cppcheck
 - ./check.sh
 - Get a coffee 
+
+# Installation Requirements
+
+Ubuntu
+
+Install libpcre before executing the fuzzing script with
+```
+ $ sudo apt-get install libpcre3-dev
+```
