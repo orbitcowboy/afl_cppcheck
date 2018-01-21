@@ -4,8 +4,8 @@
 # cleanup from previous run
 rm -fR crashes
 mkdir crashes
-# copy crashes from afl_output into crashes folder
-cp -f alf_output/crashes/* crashes/.
+# copy crashes from afl-output into crashes folder
+cp -f afl-output/crashes/* crashes/.
 cd crashes
 # cleanup potential duplicates
 fdupes -N -d -q .
