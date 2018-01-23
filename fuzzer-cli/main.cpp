@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   }
 
   std::ostringstream ostr;
-  std::ifstream f(argv[1]);
+  std::ifstream f(filename);
   if (!f.is_open()) {
     std::cout << "fopen\n";
     return 1;
