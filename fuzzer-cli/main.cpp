@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
     code = ostr.str();
     break;
   case 1:
-    code = "void f() {\n  x=" + ostr.str() + "\n}";
+    code = "void f() {\n  x=" + ostr.str() + ";\n}";
     break;
   }
   std::cout << code << std::endl;
