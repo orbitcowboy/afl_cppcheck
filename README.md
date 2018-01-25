@@ -23,7 +23,8 @@ Install libpcre before executing the fuzzing script with
 
 # Utility scripts
 
-```pullAndBuild.sh```
+```pullAndBuild.sh```:
+
 In case you have already checked out afl-fuzz and cppcheck, but the executables
 are old. Use ```pullAndBuild.sh``` get refresh your tool environment. This
 script pulls the latest sources and builds the executables.
