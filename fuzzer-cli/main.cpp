@@ -82,10 +82,13 @@ static void writeCode(std::ostream &ostr, int type, unsigned int *value, unsigne
 int main(int argc, char **argv) {
   const char *filename = nullptr;
   int type = 0;
+  bool execCppcheck=true;
 
   for (int i = 1; i < argc; ++i) {
 	if (strcmp(argv[i],"1")==0)
 	  type = 1;
+	else if (strcmp(argv[i],"x")==0)
+	  execCppcheck = false;
 	else
 	  filename = argv[i];  
   }
@@ -121,9 +124,10 @@ int main(int argc, char **argv) {
     break;
   }
   std::cout << code << std::endl;
-
-  CppcheckExecutor cppcheckExecutor;
-  cppcheckExecutor.run(code.c_str());
-
+  
+  if(execCppcheck) {
+    CppcheckExecutor cppcheckExecutor;
+    cppcheckExecutor.run(code.c_str());
+  }
   return 0;
 }
