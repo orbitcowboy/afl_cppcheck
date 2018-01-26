@@ -15,9 +15,9 @@ A script to start fuzzing of cppcheck with american fuzzy lop
 
 Ubuntu
 
-Install libpcre before executing the fuzzing script with
+The following packages shall be installed before fuzzing can start
 ```
- $ sudo apt-get install libpcre3-dev
+ $ sudo apt-get install libpcre3-dev fdupes
 ```
 
 
@@ -38,3 +38,7 @@ away previously generated results, stored in afl-output.
 
 This script restarts a previously stopped fuzzing session. The required input data is 
 taken from afl-output-folder. 
+
+```reduce.sh```:
+
+This script tries to reduce crashes as much as possible. 
