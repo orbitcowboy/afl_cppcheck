@@ -16,14 +16,14 @@ cd ${WORKINGDIR}/crashes
 # cleanup potential duplicates
 fdupes -N -d -q .
 # Execute cppcheck-fuzzing-client to generate files 
-j=0; for i in id* ; do let j+=1 ; ${WORKINGDIR}/fuzzer-cli/cppcheck-fuzzing-client 1 x $i > crash$j.c; done
+j=0; for i in id* ; do let j+=1 ; ${WORKINGDIR}/fuzzer-cli/cppcheck-fuzzing-client 1 x ${i} > crash${j}.c; done
 # Cleanup files from afl-output/crashes
 rm -f id*
 # reduce with afl-tmin
-j=0; for i in *.c ; do let j+=1 ; ${WORKINGDIR}/afl/afl-tmin -t 5000 -i $i -o r$i -- ${CPPCHECK_CALL} @@ ; done
+j=0; for i in *.c ; do let j+=1 ; ${WORKINGDIR}/afl/afl-tmin -t 5000 -i ${i} -o r${i} -- ${CPPCHECK_CALL} @@ ; done
 # cleanup original crashes and keep reduced
 rm crash*.c
-j=0; for i in rcrash*.c ; do let j+=1 ; mv $i crash_${CURRENT_DATE}_$j.c ; done
+j=0; for i in rcrash*.c ; do let j+=1 ; mv ${i} crash_${CURRENT_DATE}_${j}.c ; done
 # cleanup potential duplicates
 fdupes -N -d -q .
 # go back to working directory
