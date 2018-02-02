@@ -41,4 +41,13 @@ taken from afl-output-folder.
 
 ```reduce.sh```:
 
-This script tries to reduce crashes as much as possible. 
+This script tries to reduce crashes as much as possible. After the crashes have been reduced,
+you might call ```backtrace.sh``` in order create gdb-backtrace files.
+
+```backtrace.sh```
+
+This script generates gdb-backtraces from reduced crash files. Call it after ```reduce.sh```
+
+```initialSetup.sh```:
+
+This script clones the latest version of cppcheck and afl-fuzz from github. 
