@@ -3,13 +3,30 @@ A script to start fuzzing of cppcheck with american fuzzy lop
 
 ![A screenshot of afl fuzzing of cppcheck](screenshot/afl_cppcheck.png?raw=true "A screenshot")
 
-# Usage
+# First usage
 
 - Open a Linux console
 - git clone https://github.com/orbitcowboy/afl_cppcheck.git
 - cd afl_cppcheck
-- ./check.sh
+- bash initialSetup.sh
+- bash pullAndBuild.sh
+- bash freshStart.sh
 - Get a coffee 
+
+
+# Restart 
+
+- cd afl_cppcheck
+- bash restart.sh
+
+
+# Crash Reduction 
+
+In case afl-fuzz has found crashes, you might be interested in getting
+a small test case, leading to a crash of Cppcheck. In this case, call 
+```reduce.sh```. After the script has finished, the reduced crashes can
+be found in afl_cppcheck/crashes.
+
 
 # Installation Requirements
 
@@ -50,4 +67,4 @@ This script generates gdb-backtraces from reduced crash files. Call it after ```
 
 ```initialSetup.sh```:
 
-This script clones the latest version of cppcheck and afl-fuzz from github. 
+This script clones the latest version of Cppcheck and afl-fuzz from github. 
