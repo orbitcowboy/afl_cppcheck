@@ -10,6 +10,9 @@ A script to start fuzzing of cppcheck with american fuzzy lop
 - cd afl_cppcheck
 - bash initialSetup.sh
 - bash pullAndBuild.sh
+- sudo su
+-    echo core >/proc/sys/kernel/core_pattern
+-    exit
 - bash freshStart.sh
 - Get a coffee 
 

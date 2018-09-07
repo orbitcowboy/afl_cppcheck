@@ -2,7 +2,7 @@
 # a small client for fuzzers. binary input from fuzzers (afl) is converted to source code.
 TARGET_NAME=cppcheck-fuzzing-client
 # Set afl-g++ as default compiler
-AFL_GPP=../afl/afl-g++
+AFL_GPP=../afl/afl-clang++
 CXX=${AFL_GPP}
 CXX_OPT=-std=c++11 -g -static -O1
 CPPCHECK_DIR=../cppcheck

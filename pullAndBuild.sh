@@ -9,19 +9,19 @@ set -e
 
 # Determine the current working directory
 WORKINGDIR=$(dirname $(readlink -f $0))
-AFL_GPP=../afl/afl-g++
+AFL_GPP=../afl/afl-clang++
 # Update afl-sources and build
 
 cd ${WORKINGDIR}/afl 
 git stash
 git pull
-make all -j4 CXX=clang++ CC=clang
+make all -j12 CXX=clang++ CC=clang
 
 # Update cppcheck-sources and build 
 cd ${WORKINGDIR}/cppcheck
 git stash
 git pull
-make CXX=${AFL_GPP} all -j4
+make CXX=${AFL_GPP} all -j12
 
 # Build fuzzer-cli executable
 cd ${WORKINGDIR}/fuzzer-cli/
