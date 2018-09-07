@@ -62,7 +62,7 @@ taken from afl-output-folder.
 ```reduce.sh```:
 
 This script tries to reduce crashes as much as possible. After the crashes have been reduced,
-you might call ```backtrace.sh``` in order create gdb-backtrace files.
+you might call ```backtrace.sh``` in order to create gdb-backtrace files.
 
 ```backtrace.sh```
 
