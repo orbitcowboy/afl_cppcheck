@@ -4,8 +4,8 @@ set -e
 # This small script pulls the latest version of afl-fuzz and cppcheck
 # and builds the executables from:
 #  - afl-fuzz
-#  - cppcheck   (instrumented by afl-g++)
-#  - fuzzer-cli (instrumented by afl-g++)
+#  - cppcheck   (instrumented by afl-clang++)
+#  - fuzzer-cli (instrumented by afl-clang++)
 
 # Determine the current working directory
 WORKINGDIR=$(dirname $(readlink -f $0))
@@ -15,13 +15,13 @@ AFL_GPP=../afl/afl-clang++
 cd ${WORKINGDIR}/afl 
 git stash
 git pull
-make all -j12 CXX=clang++ CC=clang
+make clean all -j12 CXX=clang++ CC=clang
 
 # Update cppcheck-sources and build 
 cd ${WORKINGDIR}/cppcheck
 git stash
 git pull
-make CXX=${AFL_GPP} all -j12
+make clean CXX=${AFL_GPP} all -j12
 
 # Build fuzzer-cli executable
 cd ${WORKINGDIR}/fuzzer-cli/
