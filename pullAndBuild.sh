@@ -12,10 +12,10 @@ WORKINGDIR=$(dirname $(readlink -f $0))
 AFL_GPP=../afl/afl-g++
 # Update afl-sources and build
 
-cd ${WORKINGDIR}/afl
+cd ${WORKINGDIR}/afl 
 git stash
 git pull
-make all -j4
+make all -j4 CXX=clang++ CC=clang
 
 # Update cppcheck-sources and build 
 cd ${WORKINGDIR}/cppcheck
@@ -26,7 +26,6 @@ make CXX=${AFL_GPP} all -j4
 # Build fuzzer-cli executable
 cd ${WORKINGDIR}/fuzzer-cli/
 make clean all
-
 
 # Return back to previous directory
 cd ${WORKINGDIR}
