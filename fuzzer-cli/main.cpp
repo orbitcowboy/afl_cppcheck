@@ -19,7 +19,7 @@ public:
     }
 
     void run(const char code[]) {
-        cppcheck.check("test.c", code);
+        cppcheck.check("test.cpp", code);
     }
 
     void reportOut(const std::string &outmsg) { }
@@ -44,7 +44,8 @@ static const char * const data1[] = {
  "<", "<=", "==", "!=", ">=", ">",
  "+", "-", "*", "/", "%", "~", "&", "|", "^", "&&", "||", "++", "--", "=", "?", ":",
  "name1", "name2", "name3", "name4", "name5", "name6",
- ",", ";", "#", "##",
+ "const", "void", "char", "int", "enum", "if", "else", "while", "for", "switch", "case", "default", "return", "continue", "break", "struct", "typedef",
+ ",", ";", "#", "##", ".", "->", "...",
  "1", "0.1", "0xff", "-5", "\"abc\"", "'x'"
 };
 
@@ -52,7 +53,7 @@ static const char * const data1[] = {
 
 static void writeCode(std::ostream &ostr, int type, unsigned int *value, unsigned int *ones, const unsigned int min) {
   static char par[20] = {' ',0};
-  static char parindex;
+  static char parindex = 0;
   const unsigned int num = (type == 0) ? NUM(data0) : NUM(data1);
   const char * const * const data = (type == 0) ? data0 : data1;
   while (*ones > min) {
