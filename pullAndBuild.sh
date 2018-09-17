@@ -15,13 +15,15 @@ AFL_GPP=../afl/afl-clang++
 cd ${WORKINGDIR}/afl 
 git stash
 git pull
-make clean all -j12 CXX=clang++ CC=clang
+make clean
+make all -j12 CXX=clang++ CC=clang
 
 # Update cppcheck-sources and build 
 cd ${WORKINGDIR}/cppcheck
 git stash
 git pull
-make clean CXX=${AFL_GPP} all -j12
+make clean
+make CXX=${AFL_GPP} -j12
 
 # Build fuzzer-cli executable
 cd ${WORKINGDIR}/fuzzer-cli/
