@@ -61,7 +61,7 @@ static void writeCode(std::ostream &ostr, int type, unsigned int *value, unsigne
       *value = *value / num;
       *ones = *ones / num;
 
-      if (parindex < sizeof(par) && std::strchr("([{", *data[i]))
+      if (parindex < (sizeof(par)-1) && std::strchr("([{", *data[i]))
         par[++parindex] = *data[i+1];
       else if (std::strchr(")]}", *data[i])) {
         while (parindex > 0 && par[parindex] != *data[i])
