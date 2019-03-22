@@ -5,6 +5,13 @@
 
 #include "cppcheck.h"
 
+#ifdef NOMAIN
+constexpr int type = 1;
+constexpr bool execCppcheck = true;
+#else
+int type = 1;
+bool execCppcheck = true;
+#endif
 
 class CppcheckExecutor : public ErrorLogger {
 private:
@@ -18,7 +25,7 @@ public:
         cppcheck.settings().inconclusive = true;
     }
 
-    void run(const char code[]) {
+    void run(const std::string &code) {
         cppcheck.check("test.cpp", code);
     }
 
@@ -80,35 +87,12 @@ static void writeCode(std::ostream &ostr, int type, unsigned int *value, unsigne
     }
 }
 
-int main(int argc, char **argv) {
-  const char *filename = nullptr;
-  int type = 0;
-  bool execCppcheck=true;
-
-  for (int i = 1; i < argc; ++i) {
-	if (strcmp(argv[i],"1")==0)
-	  type = 1;
-	else if (strcmp(argv[i],"x")==0)
-	  execCppcheck = false;
-	else
-	  filename = argv[i];  
-  }
-
-  if (!filename) {
-    std::cout << "Invalid args\n";
-    return 1;
-  }
-
+std::string generateCode(const uint8_t *data, size_t dataSize) {
   std::ostringstream ostr;
-  std::ifstream f(filename);
-  if (!f.is_open()) {
-    std::cout << "fopen\n";
-    return 1;
-  }
   unsigned int value = 0;
   unsigned int ones = 0;
-  while (f.good()) {
-    unsigned char c = f.get();
+  for (size_t i = 0; i < dataSize; ++i) {
+    uint8_t c = data[i];
     value = (value << 8) | c;
     ones = (ones << 8) | 0xff;
     writeCode(ostr, type, &value, &ones, 0x100);
@@ -124,11 +108,51 @@ int main(int argc, char **argv) {
     code = "void f() {\n  x=" + ostr.str() + ";\n}";
     break;
   }
-  std::cout << code << std::endl;
+  return code;
+}
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize) {
   
-  if(execCppcheck) {
-    CppcheckExecutor cppcheckExecutor;
-    cppcheckExecutor.run(code.c_str());
-  }
+  CppcheckExecutor cppcheckExecutor;
+  cppcheckExecutor.run(generateCode(data, dataSize));
+
   return 0;
 }
+
+#ifndef NO_MAIN
+
+int main(int argc, char **argv) {
+  const char *filename = nullptr;
+  bool execCppcheck = true;
+
+  for (int i = 1; i < argc; ++i) {
+    if (strcmp(argv[i],"1")==0)
+      type = 1;
+    else if (strcmp(argv[i],"x")==0)
+       execCppcheck = false;
+    else
+      filename = argv[i];  
+  }
+
+  if (!filename) {
+    std::cout << "Invalid args, no filename\n";
+    return 1;
+  }
+
+  std::ifstream f(filename);
+  if (!f.is_open()) {
+    std::cout << "failed to open file:" << filename << "\n";
+    return 1;
+  }
+
+  std::string str((std::istreambuf_iterator<char>(f)),
+                   std::istreambuf_iterator<char>());
+
+  if (execCppcheck)
+    LLVMFuzzerTestOneInput((const uint8_t *)str.data(), str.size());
+  else
+    std::cout << generateCode((const uint8_t *)str.data(), str.size()) << std::endl;
+
+  return 0;
+}
+#endif
