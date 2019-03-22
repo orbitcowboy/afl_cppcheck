@@ -27,7 +27,7 @@ make CXX=${AFL_GPP} -j12
 
 # Build fuzzer-cli executable
 cd ${WORKINGDIR}/fuzzer-cli/
-make clean all
+make CXX=${AFL_GPP} CXXFLAGS="-static -O1" clean all
 
 # Return back to previous directory
 cd ${WORKINGDIR}

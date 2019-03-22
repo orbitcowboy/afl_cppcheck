@@ -16,7 +16,7 @@ cd ${WORKINGDIR}/crashes
 # cleanup potential duplicates
 fdupes -N -d -q .
 # Execute cppcheck-fuzzing-client to generate files 
-j=0; for i in id* ; do let j+=1 ; ${WORKINGDIR}/fuzzer-cli/cppcheck-fuzzing-client 1 x ${i} > crash${j}.c; done
+j=0; for i in id* ; do let j+=1 ; ${WORKINGDIR}/fuzzer-cli/cppcheck-fuzzing-client --type1 --translate-input ${i} > crash${j}.c; done
 # Cleanup files from afl-output/crashes
 rm -f id*
 # reduce with afl-tmin
