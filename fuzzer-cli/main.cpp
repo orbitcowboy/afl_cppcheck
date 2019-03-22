@@ -126,9 +126,9 @@ int main(int argc, char **argv) {
   bool execCppcheck = true;
 
   for (int i = 1; i < argc; ++i) {
-    if (strcmp(argv[i],"1")==0)
+    if (strcmp(argv[i],"--type1")==0)
       type = 1;
-    else if (strcmp(argv[i],"x")==0)
+    else if (strcmp(argv[i],"--translate-input")==0)
        execCppcheck = false;
     else
       filename = argv[i];  
