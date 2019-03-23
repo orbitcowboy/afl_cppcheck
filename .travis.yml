@@ -1,0 +1,17 @@
+language: cpp 
+os:
+  - linux
+  - osx
+complier:
+  - gcc 
+  - clang 
+addons:
+  apt:
+    packages:
+      - valgrind
+      - cppcheck
+      - make
+      - lcov
+script:
+   bash initialSetup.sh
+   bash pullAndBuild.sh
