@@ -2,6 +2,8 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0ed81bc9d1a042a2b7e57a60ffa373b1)](https://app.codacy.com/app/orbitcowboy/afl_cppcheck?utm_source=github.com&utm_medium=referral&utm_content=orbitcowboy/afl_cppcheck&utm_campaign=Badge_Grade_Dashboard)
 
+|[![Linux Build Status](https://img.shields.io/travis/orbitcowboy/afl_cppcheck/master.svg?label=Linux%20build)](https://travis-ci.org/orbitcowboy/afl_cppcheck)
+
 A script to start fuzzing of cppcheck with american fuzzy lop
 
 ![A screenshot of afl fuzzing of cppcheck](screenshot/afl_cppcheck.png?raw=true "A screenshot")
