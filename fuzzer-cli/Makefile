@@ -21,5 +21,8 @@ all: ${TARGET_NAME}
 ${TARGET_NAME}:
 	${CXX} -std=c++11 -g ${CXXFLAGS} -o ${TARGET_NAME} ${INCLUDE_DIR} ${SRC_FILES}
 
+oss-fuzz-client:
+	${CXX} -std=c++11 -g -DNO_MAIN ${CXXFLAGS} -o oss-fuzz-client ${INCLUDE_DIR} ${SRC_FILES}
+
 clean:
 	rm -f ${TARGET_NAME}
