@@ -125,12 +125,19 @@ int main(int argc, char **argv) {
   const char *filename = nullptr;
   bool execCppcheck = true;
 
+  std::cout << "Command line:";
+  for (int i = 0; i < argc; ++i)
+    std::cout << " " << argv[i];
+  std::cout << "\n";
+
   for (int i = 1; i < argc; ++i) {
     if (strcmp(argv[i],"--type1")==0)
       type = 1;
     else if (strcmp(argv[i],"--translate-input")==0)
        execCppcheck = false;
-    else
+    else if (*argv[i] == '-') {
+      std::cout << "Invalid option: " << argv[i] << std::endl;
+    } else
       filename = argv[i];  
   }
 
