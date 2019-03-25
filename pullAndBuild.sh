@@ -17,14 +17,14 @@ cd "$WORKINGDIR"/afl
 git stash
 git pull
 make clean
-make all -j${CPU_CORES_ON_SYSTEM} CXX=clang++ CC=clang
+make all -j"$CPU_CORES_ON_SYSTEM" CXX=clang++ CC=clang
 
 # Update cppcheck-sources and build 
 cd "$WORKINGDIR"/cppcheck
 git stash
 git pull
 make clean
-make CXX=${AFL_GPP} -j${CPU_CORES_ON_SYSTEM}
+make CXX=${AFL_GPP} -j"$CPU_CORES_ON_SYSTEM"
 
 # Build fuzzer-cli executable
 cd "$WORKINGDIR"/fuzzer-cli/
