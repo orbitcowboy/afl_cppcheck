@@ -169,9 +169,57 @@ static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize
     return "0";
 }
 
-static std::string functionStart(int functionNumber) {
-    return "int f" + std::to_string(functionNumber) + "()\n"
+static std::string functionStart() {
+    static int functionNumber;
+    return "int f" + std::to_string(++functionNumber) + "()\n"
            "{\n";
+}
+
+static std::string generateExpression2_conditionalCode(const std::string &indent,
+        const uint8_t *data,
+        size_t dataSize,
+        int numberOfGlobalConstants)
+{
+    std::ostringstream code;
+
+    if (indent.empty())
+        code << functionStart();
+    else
+        code << indent << "{\n";
+
+    while (true) {
+        bool done = false;
+        const int type = getValue(data, dataSize, 5, &done);
+        if (done)
+            break;
+
+        if (type == 0) {
+            code << indent << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+        } else if (type == 1) {
+            code << indent << "    if (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
+            code << generateExpression2_conditionalCode(indent + "  ", data, dataSize, numberOfGlobalConstants);
+        } else if (type == 2) {
+            code << indent << "    if (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
+            code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
+            code << indent << "    else\n";
+            code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
+        } else if (type == 3) {
+            code << indent << "    while (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
+            code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
+        } else if (type == 4) {
+            code << indent << "    return " << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+            if (indent.empty())
+                code << "}\n\n" << functionStart();
+            else
+                break;
+        }
+    }
+
+    if (!indent.empty())
+        code << indent << "}\n";
+    else
+        code << "    return 0;\n}\n";
+    return code.str();
 }
 
 static std::string generateCode2(const uint8_t *data, size_t dataSize) {
@@ -193,33 +241,8 @@ static std::string generateCode2(const uint8_t *data, size_t dataSize) {
          "int var4 = 0;\n"
          "int var5 = -1;\n\n";
 
-    int functionNumber = 1;
-    code << functionStart(functionNumber++);
+    code << generateExpression2_conditionalCode("", data, dataSize, numberOfGlobalConstants);
 
-    while (true) {
-        bool done = false;
-        const int type = getValue(data, dataSize, 5, &done);
-        if (done)
-            break;
-        if (type == 0) {
-            code << "  var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-        } else if (type == 1) {
-            code << "  if (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
-            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-        } else if (type == 2) {
-            code << "  if (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
-            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-            code << "  else\n";
-            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-        } else if (type == 3) {
-            code << "  while (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
-            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-        } else if (type == 4) {
-            code << "  return " << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-            code << "}\n\n" << functionStart(functionNumber++);
-        }
-    }
-    code << "  return 0;\n}\n";
     return code.str();
 }
 
