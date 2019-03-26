@@ -18,7 +18,7 @@ SRC_FILES=main.cpp ${CPPCHECK_DIR}/externals/simplecpp/simplecpp.cpp ${CPPCHECK_
 
 all: ${TARGET_NAME}
 
-${TARGET_NAME}:
+${TARGET_NAME}: main.cpp
 	${CXX} -std=c++11 -g ${CXXFLAGS} -o ${TARGET_NAME} ${INCLUDE_DIR} ${SRC_FILES}
 
 oss-fuzz-client:

@@ -6,12 +6,15 @@
 #include "cppcheck.h"
 
 #ifdef NOMAIN
-constexpr int type = 1;
+constexpr int type = 2;
 constexpr bool execCppcheck = true;
 #else
-int type = 1;
+int type = 0;
 bool execCppcheck = true;
 #endif
+
+// Type 2 constants:
+constexpr int TYPE2_BITS_VARNR = 2;  // 4 local variables
 
 class CppcheckExecutor : public ErrorLogger {
 private:
@@ -87,7 +90,143 @@ static void writeCode(std::ostream &ostr, int type, unsigned int *value, unsigne
     }
 }
 
-std::string generateCode(const uint8_t *data, size_t dataSize) {
+int getValue(const uint8_t *data, size_t dataSize, uint8_t maxValue, bool *done = nullptr) {
+    static size_t pos;    // current "data" position
+    static int dataValue; // value extracted from data
+    static int ones;      // ones. This variable tracks if we need to add more stuff in "dataValue".
+
+    // Shift more bits from "data" into "dataValue" if needed
+    while (pos < dataSize && ones < 0xFFFF) {
+        ones = (ones << 8) | 0xff;
+        dataValue = (dataValue << 8) | data[pos];
+        pos++;
+    }
+
+    if (done)
+        *done = (pos >= dataSize);
+
+    if (maxValue == 0)
+        return 0;
+
+    // Shift out info from "dataValue" using % . Using & and >> would work but then we are limited to "power of 2" max value.
+    const int ret = dataValue % maxValue;
+    ones /= maxValue;
+    dataValue /= maxValue;
+    return ret;
+}
+
+static std::string generateExpression2_lvalue(const uint8_t *data, size_t dataSize) {
+    return "var" + std::to_string(getValue(data, dataSize, 5));
+}
+
+static std::string generateExpression2_Op(const uint8_t *data, size_t dataSize, int numberOfGlobalConstants) {
+    std::ostringstream code;
+    switch (getValue(data, dataSize, 3))
+    {
+    case 0:
+        code << generateExpression2_lvalue(data, dataSize);
+        break;
+    case 1:
+        code << "globalconstant" << getValue(data, dataSize, numberOfGlobalConstants);
+        break;
+    case 2:
+        code << (getValue(data, dataSize, 0x80) * 0x80 + getValue(data, dataSize, 0x80));
+        break;
+    };
+    return code.str();
+}
+
+static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize, int numberOfGlobalConstants, int depth=0) {
+    ++depth;
+    const unsigned int type = (depth > 3) ? 0 : getValue(data, dataSize, 3);
+    const char binop[] = "=<>+-*/%&|^";
+    const char *unop[] = {"++","--","()","~"};
+
+    switch (type) {
+    case 0:
+        return generateExpression2_Op(data, dataSize, numberOfGlobalConstants);
+    case 1: {
+        const char op = binop[getValue(data,dataSize,sizeof(binop)/sizeof(*binop))];
+        const std::string lhs = (op == '=') ?
+                                generateExpression2_lvalue(data, dataSize) :
+                                generateExpression2_Expr(data, dataSize, numberOfGlobalConstants, depth);
+        const std::string rhs = generateExpression2_Expr(data, dataSize, numberOfGlobalConstants, depth);
+
+        return lhs + op + rhs;
+    }
+    case 2: {
+        const char *u = unop[getValue(data,dataSize,sizeof(unop)/sizeof(*unop))];
+        if (u == std::string("()"))
+            return "(" + generateExpression2_Expr(data, dataSize, numberOfGlobalConstants, depth) + ")";
+        else if (u == std::string("++") || u == std::string("--"))
+            return u + generateExpression2_lvalue(data, dataSize);
+        return u + generateExpression2_Expr(data, dataSize, numberOfGlobalConstants, depth);
+    }
+    default:
+        break;
+    };
+
+    return "0";
+}
+
+static std::string functionStart(int functionNumber) {
+    return "int f" + std::to_string(functionNumber) + "()\n"
+           "{\n";
+}
+
+static std::string generateCode2(const uint8_t *data, size_t dataSize) {
+    std::ostringstream code;
+
+    // create global constants
+    constexpr int numberOfGlobalConstants = 0;
+    /*
+      const int numberOfGlobalConstants = getValue(data, dataSize, 5);
+      for (int nr = 1; nr <= numberOfGlobalConstants; nr++) {
+        const char *types[4] = {"char", "int", "long long", "float"};
+        code << "const " << types[getValue(data, dataSize, 4)] << " globalconstant" << nr << " = " << generateExpression2_Expr(data, dataSize, nr - 1) << ";\n";
+      }
+    */
+
+    code << "int var1 = 1;\n"
+         "int var2 = 0;\n"
+         "int var3 = 1;\n"
+         "int var4 = 0;\n"
+         "int var5 = -1;\n\n";
+
+    int functionNumber = 1;
+    code << functionStart(functionNumber++);
+
+    while (true) {
+        bool done = false;
+        const int type = getValue(data, dataSize, 5, &done);
+        if (done)
+            break;
+        if (type == 0) {
+            code << "  var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+        } else if (type == 1) {
+            code << "  if (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
+            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+        } else if (type == 2) {
+            code << "  if (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
+            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+            code << "  else\n";
+            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+        } else if (type == 3) {
+            code << "  while (" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ")\n";
+            code << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+        } else if (type == 4) {
+            code << "  return " << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
+            code << "}\n\n" << functionStart(functionNumber++);
+        }
+    }
+    code << "  return 0;\n}\n";
+    return code.str();
+}
+
+static std::string generateCode(const uint8_t *data, size_t dataSize) {
+    if (type == 2)
+        return generateCode2(data, dataSize);
+
     std::ostringstream ostr;
     unsigned int value = 0;
     unsigned int ones = 0;
@@ -115,7 +254,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize) {
 
     CppcheckExecutor cppcheckExecutor;
     cppcheckExecutor.run(generateCode(data, dataSize));
-
     return 0;
 }
 
@@ -133,6 +271,8 @@ int main(int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i],"--type1")==0)
             type = 1;
+        else if (strcmp(argv[i],"--type2")==0)
+            type = 2;
         else if (strcmp(argv[i],"--translate-input")==0)
             execCppcheck = false;
         else if (*argv[i] == '-') {
