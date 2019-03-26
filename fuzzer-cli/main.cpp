@@ -198,7 +198,8 @@ static std::string generateExpression2_conditionalCode(const std::string &indent
     else
         code << indent << "{\n";
 
-    while (true) {
+    for (int line = 0; line < 4 || indent.empty(); ++line)
+    {
         bool done = false;
         const int type = getValue(data, dataSize, 5, &done);
         if (done)
@@ -208,7 +209,7 @@ static std::string generateExpression2_conditionalCode(const std::string &indent
             code << indent << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
         } else if (type == 1) {
             code << indent << "    if (" << generateExpression2_Cond(data, dataSize, numberOfGlobalConstants) << ")\n";
-            code << generateExpression2_conditionalCode(indent + "  ", data, dataSize, numberOfGlobalConstants);
+            code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
         } else if (type == 2) {
             code << indent << "    if (" << generateExpression2_Cond(data, dataSize, numberOfGlobalConstants) << ")\n";
             code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
