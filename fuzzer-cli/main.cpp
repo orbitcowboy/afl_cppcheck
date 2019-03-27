@@ -146,7 +146,7 @@ static std::string generateExpression2_Expr(const uint8_t *data, size_t dataSize
     case 0:
         return generateExpression2_Op(data, dataSize, numberOfGlobalConstants);
     case 1: {
-        const char op = binop[getValue(data,dataSize,sizeof(binop)/sizeof(*binop))];
+        const char op = binop[getValue(data,dataSize,sizeof(binop)-1)];
         const std::string lhs = (op == '=') ?
                                 generateExpression2_lvalue(data, dataSize) :
                                 generateExpression2_Expr(data, dataSize, numberOfGlobalConstants, depth);
@@ -174,9 +174,9 @@ static std::string generateExpression2_Cond(const uint8_t *data, size_t dataSize
 {
     const char *comp[] = {"==", "!=", "<", "<=", ">", ">="};
     const int i = getValue(data, dataSize, 6);
-    return generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) +
-           comp[i] +
-           generateExpression2_Expr(data, dataSize, numberOfGlobalConstants);
+    const std::string lhs = generateExpression2_Expr(data, dataSize, numberOfGlobalConstants);
+    const std::string rhs = generateExpression2_Expr(data, dataSize, numberOfGlobalConstants);
+    return lhs + comp[i] + rhs;
 }
 
 
