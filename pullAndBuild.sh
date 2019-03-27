@@ -13,6 +13,8 @@ CPU_CORES_ON_SYSTEM=$(eval "/usr/bin/nproc")
 AFL_GPP=../afl/afl-clang++
 # Update afl-sources and build
 
+git pull
+
 cd "$WORKINGDIR"/afl 
 git stash
 git pull
