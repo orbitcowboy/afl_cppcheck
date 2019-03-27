@@ -103,7 +103,7 @@ int getValue(const uint8_t *data, size_t dataSize, uint8_t maxValue, bool *done 
     }
 
     if (done)
-        *done = (pos >= dataSize);
+        *done = (ones == 0);
 
     if (maxValue == 0)
         return 0;
