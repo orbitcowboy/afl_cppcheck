@@ -116,7 +116,7 @@ int getValue(const uint8_t *data, size_t dataSize, uint8_t maxValue, bool *done 
 }
 
 static std::string generateExpression2_lvalue(const uint8_t *data, size_t dataSize) {
-    return "var" + std::to_string(getValue(data, dataSize, 5));
+    return "var" + std::to_string(1 + getValue(data, dataSize, 5));
 }
 
 static std::string generateExpression2_Op(const uint8_t *data, size_t dataSize, int numberOfGlobalConstants) {
@@ -127,7 +127,7 @@ static std::string generateExpression2_Op(const uint8_t *data, size_t dataSize, 
         code << generateExpression2_lvalue(data, dataSize);
         break;
     case 1:
-        code << "globalconstant" << getValue(data, dataSize, numberOfGlobalConstants);
+        code << "globalconstant" << (1 + getValue(data, dataSize, numberOfGlobalConstants));
         break;
     case 2:
         code << (getValue(data, dataSize, 0x80) * 0x80 + getValue(data, dataSize, 0x80));
@@ -201,24 +201,30 @@ static std::string generateExpression2_conditionalCode(const std::string &indent
     for (int line = 0; line < 4 || indent.empty(); ++line)
     {
         bool done = false;
-        const int type = getValue(data, dataSize, 5, &done);
+        const int type1 = getValue(data, dataSize, 8, &done);
         if (done)
             break;
 
-        if (type == 0) {
+        const int mostLikelyType = (line >= 2) ? 4 : 0;  // should var assignment or return be more likely?
+
+        const int type2 = (indent.size() >= 12) ?
+                          mostLikelyType :  // max indentation, no inner conditions
+                          ((type1 >= 5) ? mostLikelyType : type1);
+
+        if (type2 == 0) {
             code << indent << "    var" << getValue(data, dataSize, 5) << "=" << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
-        } else if (type == 1) {
+        } else if (type2 == 1) {
             code << indent << "    if (" << generateExpression2_Cond(data, dataSize, numberOfGlobalConstants) << ")\n";
             code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
-        } else if (type == 2) {
+        } else if (type2 == 2) {
             code << indent << "    if (" << generateExpression2_Cond(data, dataSize, numberOfGlobalConstants) << ")\n";
             code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
             code << indent << "    else\n";
             code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
-        } else if (type == 3) {
+        } else if (type2 == 3) {
             code << indent << "    while (" << generateExpression2_Cond(data, dataSize, numberOfGlobalConstants) << ")\n";
             code << generateExpression2_conditionalCode(indent + "    ", data, dataSize, numberOfGlobalConstants);
-        } else if (type == 4) {
+        } else if (type2 == 4) {
             code << indent << "    return " << generateExpression2_Expr(data, dataSize, numberOfGlobalConstants) << ";\n";
             if (indent.empty())
                 code << "}\n\n" << functionStart();
