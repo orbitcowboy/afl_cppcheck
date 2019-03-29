@@ -293,8 +293,8 @@ static std::string generateCode(const uint8_t *data, size_t dataSize) {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t dataSize) {
 
-    CppcheckExecutor cppcheckExecutor;
-    cppcheckExecutor.run(generateCode(data, dataSize));
+    //CppcheckExecutor cppcheckExecutor;
+    //cppcheckExecutor.run(generateCode(data, dataSize));
     return 0;
 }
 
