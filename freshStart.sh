@@ -14,4 +14,4 @@ head -c 4 /dev/urandom > "$INPUT_FILE"
 # Remove the afl-output directory (if exists)
 rm -fR "$AFL_OUTPUT_DIR"
 # Start fuzzing
-"$WORKINGDIR/afl/afl-fuzz" -i "$INPUT_DIR" -f "$INPUT_FILE" -o "$AFL_OUTPUT_DIR" -x "$WORKINGDIR/dictionary" -- "$WORKINGDIR/fuzzer-cli/cppcheck-fuzzing-client" --type1 "$INPUT_FILE" 
+"$WORKINGDIR/afl/afl-fuzz" -i "$INPUT_DIR" -f "$INPUT_FILE" -o "$AFL_OUTPUT_DIR" -x "$WORKINGDIR/dictionary" -- "$WORKINGDIR/fuzzer-cli/cppcheck-fuzzing-client" --type2 "$INPUT_FILE" 
