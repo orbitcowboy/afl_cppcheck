@@ -28,6 +28,20 @@ git pull
 make clean
 make CXX=${AFL_GPP} -j"$CPU_CORES_ON_SYSTEM"
 
+# Update cppcheck-sources and build with address sanitizer
+cd "$WORKINGDIR"/cppcheck_asan
+git stash
+git pull
+make clean
+make CXX=${AFL_GPP} CXXFLAGS="-fsanitize=address -fno-sanitize-recover=all -Og -g3" -j"$CPU_CORES_ON_SYSTEM"
+
+# Update cppcheck-sources and build with undefined sanitizer
+cd "$WORKINGDIR"/cppcheck_usan
+git stash
+git pull
+make clean
+make CXX=${AFL_GPP} CXXFLAGS="-fsanitize=undefined -fno-sanitize-recover=all -Og -g3" -j"$CPU_CORES_ON_SYSTEM"
+
 # Build fuzzer-cli executable
 cd "$WORKINGDIR"/fuzzer-cli/
 make CXX=${AFL_GPP} CXXFLAGS="-static -O1" clean all
