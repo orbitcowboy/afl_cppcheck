@@ -304,10 +304,12 @@ int main(int argc, char **argv) {
     const char *filename = nullptr;
     bool execCppcheck = true;
 
+#if 0
     std::cout << "Command line:";
     for (int i = 0; i < argc; ++i)
         std::cout << " " << argv[i];
     std::cout << "\n";
+#endif 
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i],"--type1")==0)
