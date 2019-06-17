@@ -13,7 +13,7 @@
 TARGET_NAME=cppcheck-fuzzing-client
 
 CPPCHECK_DIR=../cppcheck
-INCLUDE_DIR=-I ${CPPCHECK_DIR}/lib -I ${CPPCHECK_DIR}/externals/simplecpp -I ${CPPCHECK_DIR}/externals/tinyxml
+INCLUDE_DIR=-I ${CPPCHECK_DIR}/lib -I ${CPPCHECK_DIR}/externals/simplecpp -I ${CPPCHECK_DIR}/externals/tinyxml -I ${CPPCHECK_DIR}/externals/
 SRC_FILES=main.cpp ${CPPCHECK_DIR}/externals/simplecpp/simplecpp.cpp ${CPPCHECK_DIR}/externals/tinyxml/tinyxml2.cpp ${CPPCHECK_DIR}/lib/*.cpp
 OBJ_FILES=main.cpp ${CPPCHECK_DIR}/externals/simplecpp/simplecpp.o ${CPPCHECK_DIR}/externals/tinyxml/tinyxml2.o ${CPPCHECK_DIR}/lib/*.o
 
